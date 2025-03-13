@@ -43,7 +43,6 @@ def process_message(message):
         if tx_block.HasField("Header"):
             header = tx_block.Header
             print(f"Block Slot: {header.Slot}")
-            print(f"Block Hash: {base58.b58encode(header.Hash).decode()}")
            
 
         for tx in tx_block.Transactions:
