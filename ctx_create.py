@@ -3,7 +3,7 @@ import os
 from confluent_kafka import Consumer, KafkaError, KafkaException
 import uuid
 from google.protobuf.message import DecodeError
-from solana.parsed_idl_block_message_pb2 import ParsedIdlBlockMessage
+from solana import parsed_idl_block_message_pb2
 import base58
 
 group_id_suffix = uuid.uuid4().hex
@@ -34,7 +34,7 @@ TARGET_PROGRAM_ADDRESS = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
 def process_message(message):
     try:
         buffer = message.value()
-        tx_block = ParsedIdlBlockMessage()
+        tx_block = parsed_idl_block_message_pb2.ParsedIdlBlockMessage()
         tx_block.ParseFromString(buffer)
 
         print("\nNew Block Message Received")
