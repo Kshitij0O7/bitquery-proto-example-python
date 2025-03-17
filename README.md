@@ -1,3 +1,10 @@
 # solana-proto-example-python
 
-Download the solana folder to be used by Python protobuf code. 
+Install the pb2 library from https://pypi.org/project/bitquery-pb2-kafka-package/ using the command
+
+```
+
+pip install bitquery-pb2-kafka-package
+
+```
+
