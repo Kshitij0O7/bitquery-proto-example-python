@@ -1,3 +1,5 @@
+# This code filters trades of a token on Solana 
+
 import json
 import os
 import uuid
