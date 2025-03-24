@@ -8,3 +8,8 @@ pip install bitquery-pb2-kafka-package
 
 ```
 
+## Examples
+
+- Latest Token Creation Txs on Solana
+- Latest Token Creation on Pumpfun
+- Latest Trades of a token on Solana
