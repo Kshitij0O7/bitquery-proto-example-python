@@ -1,3 +1,5 @@
+# This code displays latest transactions on Solana 
+
 import json
 import os
 from confluent_kafka import Consumer, KafkaError, KafkaException
