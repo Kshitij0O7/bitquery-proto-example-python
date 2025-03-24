@@ -1,3 +1,5 @@
+# This code filters latest token creation on Solana transaction stream
+
 import json
 import os
 from confluent_kafka import Consumer, KafkaError, KafkaException
