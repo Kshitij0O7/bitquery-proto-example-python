@@ -1,4 +1,4 @@
-# This code filters latest token creation on Solana transaction stream
+# This code filters token creation txs on Solana transaction stream
 
 import json
 import os
