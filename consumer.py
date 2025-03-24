@@ -16,7 +16,7 @@ conf = {
     'security.protocol': 'SASL_SSL',
     'ssl.ca.location': '/path-to/server.cer.pem',
     'ssl.key.location': '/path-to/client.key.pem',
-    'ssl.certificate.location': '/Users/divyasshree/Documents/GitHub/kafka-example/client.cer.pem',
+    'ssl.certificate.location': '/path-to/client.cer.pem',
     'ssl.endpoint.identification.algorithm': 'none',
     'sasl.mechanisms': 'SCRAM-SHA-512',
     'sasl.username': 'usernamee',
