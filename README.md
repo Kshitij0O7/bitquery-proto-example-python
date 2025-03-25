@@ -13,3 +13,4 @@ pip install bitquery-pb2-kafka-package
 - Latest Token Creation Txs on Solana
 - Latest Token Creation on Pumpfun
 - Latest Trades of a token on Solana
+- Latest Trades on Ethereum
