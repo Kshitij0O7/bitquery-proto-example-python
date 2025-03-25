@@ -1,3 +1,4 @@
+# This code filters token creation txs on Solana transaction stream
 import json
 import os
 from confluent_kafka import Consumer, KafkaError, KafkaException
