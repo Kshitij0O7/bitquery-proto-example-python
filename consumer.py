@@ -1,6 +1,5 @@
 # This code displays latest transactions on Solana 
 
-import json
 import uuid
 import base58
 from confluent_kafka import Consumer, KafkaError, KafkaException
@@ -26,68 +25,63 @@ consumer = Consumer(conf)
 topic = 'solana.transactions.proto'
 consumer.subscribe([topic])
 
-# --- Helpers for traversal and decoding --- #
+# ---  recursive traversal and print --- #
 
 def convert_bytes(value, encoding='base58'):
-    """Convert raw protobuf bytes into base58 or hex."""
     if encoding == 'base58':
         return base58.b58encode(value).decode()
     return value.hex()
 
-def to_serializable_dict(msg, encoding='base58'):
-    """Recursively convert protobuf message into a JSON-serializable dictionary."""
-    result = {}
+def print_protobuf_message(msg, indent=0, encoding='base58'):
+    prefix = ' ' * indent
     for field in msg.DESCRIPTOR.fields:
         value = getattr(msg, field.name)
 
-        if field.label == FieldDescriptor.LABEL_REPEATED:
-            if field.type == FieldDescriptor.TYPE_MESSAGE:
-                result[field.name] = [to_serializable_dict(v, encoding) for v in value]
-            elif field.type == FieldDescriptor.TYPE_BYTES:
-                result[field.name] = [convert_bytes(v, encoding) for v in value]
-            else:
-                result[field.name] = list(value)
+        if field.label == FieldDescriptor.LABEL_REPEATED: # The field is a repeated (i.e. array/list) field.
+            if not value:
+                continue
+            print(f"{prefix}{field.name} (repeated):")
+            for idx, item in enumerate(value):
+                if field.type == FieldDescriptor.TYPE_MESSAGE: # The field is a nested protobuf message.
+                    print(f"{prefix}  [{idx}]:")
+                    print_protobuf_message(item, indent + 4, encoding)
+                elif field.type == FieldDescriptor.TYPE_BYTES:
+                    print(f"{prefix}  [{idx}]: {convert_bytes(item, encoding)}")
+                else:
+                    print(f"{prefix}  [{idx}]: {item}")
 
         elif field.type == FieldDescriptor.TYPE_MESSAGE:
             if msg.HasField(field.name):
-                result[field.name] = to_serializable_dict(value, encoding)
+                print(f"{prefix}{field.name}:")
+                print_protobuf_message(value, indent + 4, encoding)
 
         elif field.type == FieldDescriptor.TYPE_BYTES:
-            result[field.name] = convert_bytes(value, encoding)
+            print(f"{prefix}{field.name}: {convert_bytes(value, encoding)}")
 
         elif field.containing_oneof:
             if msg.WhichOneof(field.containing_oneof.name) == field.name:
-                result[field.name] = value
+                print(f"{prefix}{field.name} (oneof): {value}")
 
         else:
-            result[field.name] = value
+            print(f"{prefix}{field.name}: {value}")
 
-    return result
-
-# --- Message processing --- #
+# --- Process messages from Kafka --- #
 
 def process_message(message):
     try:
         buffer = message.value()
-
-        # Parse protobuf message
         tx_block = parsed_idl_block_message_pb2.ParsedIdlBlockMessage()
         tx_block.ParseFromString(buffer)
 
         print("\nNew ParsedIdlBlockMessage received:\n")
-
-        # Convert to dict with base58 encoding
-        message_dict = to_serializable_dict(tx_block, encoding='base58')
-
-        # Pretty print JSON
-        print(json.dumps(message_dict, indent=2))
+        print_protobuf_message(tx_block, encoding='base58')
 
     except DecodeError as err:
         print(f"Protobuf decoding error: {err}")
     except Exception as err:
         print(f"Error processing message: {err}")
 
-# --- Start polling --- #
+# --- Polling loop --- #
 
 try:
     while True:
@@ -103,5 +97,6 @@ try:
 
 except KeyboardInterrupt:
     print("Stopping consumer...")
+
 finally:
     consumer.close()
